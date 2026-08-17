@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Docs Side-by-Side",
+  "version": "1.0.0",
+  "description": "Follows your selection/cursor in Google Docs and opens matching content (Jira tickets, GitHub PRs, links) in a side-by-side browser window.",
+  "permissions": ["storage", "tabs"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://docs.google.com/document/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "browser_action": {
+    "default_title": "Docs Side-by-Side",
+    "default_popup": "popup.html"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "docs-side-by-side@jerolimov.de",
+      "strict_min_version": "102.0"
+    }
+  }
+}
