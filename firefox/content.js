@@ -27,7 +27,7 @@
       rules = ((cfg && cfg.rules) || [])
         .map((r) => {
           try {
-            return { name: r.name || 'rule', re: new RegExp(r.match), url: r.url };
+            return { name: r.name || 'rule', re: new RegExp(r.match), url: r.url, jiraKey: r.jiraKey };
           } catch (e) {
             console.warn('[docs-side-by-side] invalid pattern in config.json:', r, e);
             return null;
@@ -48,7 +48,14 @@
     for (const rule of rules) {
       const m = rule.re.exec(text);
       if (m) {
-        return { url: applyTemplate(rule.url, m), label: `${rule.name}: ${m[0]}` };
+        let url = applyTemplate(rule.url, m);
+        // Rules with a jiraKey template open in the extension's ticket
+        // viewer instead of the raw Jira page.
+        if (rule.jiraKey) {
+          const key = applyTemplate(rule.jiraKey, m);
+          url = `${api.runtime.getURL('viewer.html')}?key=${encodeURIComponent(key)}&url=${encodeURIComponent(url)}`;
+        }
+        return { url, label: `${rule.name}: ${m[0]}` };
       }
     }
     return null;

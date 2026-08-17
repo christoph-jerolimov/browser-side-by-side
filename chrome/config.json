@@ -1,7 +1,14 @@
 {
   "autoTile": true,
   "sidebarZoom": 1.25,
+  "jiraBase": "https://redhat.atlassian.net",
   "rules": [
+    {
+      "name": "Jira link",
+      "match": "https?://redhat\\.atlassian\\.net/browse/([A-Z][A-Z0-9]{1,9}-\\d+)",
+      "url": "$0",
+      "jiraKey": "$1"
+    },
     {
       "name": "Jira link",
       "match": "https?://redhat\\.atlassian\\.net/[^\\s)\\]]+",
@@ -10,7 +17,8 @@
     {
       "name": "Jira",
       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",
-      "url": "https://redhat.atlassian.net/browse/$0"
+      "url": "https://redhat.atlassian.net/browse/$0",
+      "jiraKey": "$0"
     },
     {
       "name": "GitHub PR",

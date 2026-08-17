@@ -53,9 +53,11 @@ file and reload the extension. Default:
 {
   "autoTile": true,
   "sidebarZoom": 1.25,
+  "jiraBase": "https://redhat.atlassian.net",
   "rules": [
+    { "name": "Jira link",  "match": "https?://redhat\\.atlassian\\.net/browse/([A-Z][A-Z0-9]{1,9}-\\d+)", "url": "$0", "jiraKey": "$1" },
     { "name": "Jira link",  "match": "https?://redhat\\.atlassian\\.net/[^\\s)\\]]+",        "url": "$0" },
-    { "name": "Jira",       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",                        "url": "https://redhat.atlassian.net/browse/$0" },
+    { "name": "Jira",       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",                        "url": "https://redhat.atlassian.net/browse/$0", "jiraKey": "$0" },
     { "name": "GitHub PR",  "match": "https?://github\\.com/[^/\\s]+/[^/\\s]+/pulls?/\\d+",  "url": "$0" }
   ]
 }
@@ -70,7 +72,15 @@ file and reload the extension. Default:
 - `autoTile`: set to `false` if the extension should never move/resize your
   windows and you always want to arrange them yourself.
 - `sidebarZoom`: page zoom applied to the sidebar tab so its content is a bit
-  bigger and readable in a half-width window (`1` disables it).
+  bigger and readable in a half-width window (`1` disables it; the
+  extension's own ticket viewer is excluded since it is already sized up).
+- `jiraBase`: the Jira instance the ticket viewer talks to.
+- `jiraKey` (per rule): when set, the match opens in the extension's **ticket
+  viewer** (`viewer.html`) instead of the raw Jira page. The viewer fetches
+  the ticket from `jiraBase`'s REST API using your existing Jira browser
+  session and shows summary, colored issue-type / priority / status badges,
+  assignee, and last-update time — with an "Open in Jira ↗" link. Rules
+  without `jiraKey` open their URL directly.
 
 The Jira rules cover both bare ticket IDs (`ABC-1234` →
 `https://redhat.atlassian.net/browse/ABC-1234`) and full
