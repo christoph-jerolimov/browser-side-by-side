@@ -54,14 +54,13 @@ file and reload the extension. Default:
   "autoTile": true,
   "rules": [
     { "name": "Jira",       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",                        "url": "https://jira.com/browse/$0" },
-    { "name": "GitHub PR",  "match": "https?://github\\.com/[^/\\s]+/[^/\\s]+/pulls?/\\d+",  "url": "$0" },
-    { "name": "Any link",   "match": "https?://[^\\s)\\]]+",                                  "url": "$0" }
+    { "name": "GitHub PR",  "match": "https?://github\\.com/[^/\\s]+/[^/\\s]+/pulls?/\\d+",  "url": "$0" }
   ]
 }
 ```
 
 - `rules[]` are tried in order; the first regex that matches the selection /
-  link wins.
+  link wins. Selections or links that match no rule are ignored.
 - `match` is a JavaScript regex (double-escape backslashes in JSON).
 - `url` is the page to open; `$0` is the whole match, `$1`–`$9` are capture
   groups. Example with a group:
