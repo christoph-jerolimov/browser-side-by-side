@@ -181,7 +181,12 @@ async function applySidebarZoom(tabId) {
   const cfg = await getConfig().catch(() => ({}));
   const zoom = Number(cfg.sidebarZoom) || 1;
   if (zoom === 1) return;
-  try { await api.tabs.setZoom(tabId, zoom); } catch (e) { /* page disallows zoom */ }
+  try {
+    // The extension's own viewer pages are already sized for the sidebar.
+    const tab = await api.tabs.get(tabId);
+    if (tab.url && tab.url.startsWith(api.runtime.getURL(''))) return;
+    await api.tabs.setZoom(tabId, zoom);
+  } catch (e) { /* tab gone or page disallows zoom */ }
 }
 
 api.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
