@@ -1,0 +1,20 @@
+{
+  "autoTile": true,
+  "rules": [
+    {
+      "name": "Jira",
+      "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",
+      "url": "https://jira.com/browse/$0"
+    },
+    {
+      "name": "GitHub PR",
+      "match": "https?://github\\.com/[^/\\s]+/[^/\\s]+/pulls?/\\d+",
+      "url": "$0"
+    },
+    {
+      "name": "Any link",
+      "match": "https?://[^\\s)\\]]+",
+      "url": "$0"
+    }
+  ]
+}

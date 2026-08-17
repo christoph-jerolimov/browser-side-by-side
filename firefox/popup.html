@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 280px; margin: 0; padding: 14px;
+      font: 13px/1.4 system-ui, -apple-system, sans-serif;
+      color: #202124;
+    }
+    label { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+    #status { margin: 10px 0; color: #5f6368; word-break: break-all; }
+    button {
+      display: block; width: 100%; margin-top: 6px; padding: 7px 10px;
+      border: 1px solid #dadce0; border-radius: 6px; background: #fff;
+      font: inherit; cursor: pointer;
+    }
+    button:hover { background: #f1f3f4; }
+    .hint { margin: 12px 0 0; color: #80868b; font-size: 11px; }
+  </style>
+</head>
+<body>
+  <label><input type="checkbox" id="follow"> Follow selection</label>
+  <div id="status">…</div>
+  <button id="tile">Tile windows side-by-side</button>
+  <button id="close">Close sidebar window</button>
+  <p class="hint">
+    Patterns live in <code>config.json</code> inside the extension folder.
+    Edit it and reload the extension to change them.
+  </p>
+  <script src="popup.js"></script>
+</body>
+</html>
