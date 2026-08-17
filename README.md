@@ -86,7 +86,7 @@ extension card and reload the Docs tab.
 - **Zip** (e.g. to copy to another machine):
 
   ```sh
-  cd chrome && zip -r ../docs-side-by-side-chrome.zip . && cd ..
+  ./build.sh   # writes dist/docs-side-by-side-{chrome,firefox}-<version>.zip
   ```
 
   Unzip there and "Load unpacked" again (a plain zip cannot be installed
@@ -126,9 +126,9 @@ Regular Firefox releases require signed add-ons. Options:
 ### Bundle — Firefox
 
 ```sh
+./build.sh   # writes dist/docs-side-by-side-{chrome,firefox}-<version>.zip
+# or, using Mozilla's tooling:
 npx web-ext build --source-dir firefox --artifacts-dir dist
-# or simply:
-cd firefox && zip -r ../docs-side-by-side-firefox.zip . && cd ..
 ```
 
 For live development: `npx web-ext run --source-dir firefox` starts a Firefox
