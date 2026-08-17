@@ -17,6 +17,7 @@ const els = {
   summary: document.getElementById('summary'),
   badges: document.getElementById('badges'),
   meta: document.getElementById('meta'),
+  activity: document.getElementById('activity'),
   message: document.getElementById('message'),
   freshness: document.getElementById('freshness'),
   openLink: document.getElementById('open-link'),
@@ -139,6 +140,25 @@ function render(issue) {
     row.append(b, document.createTextNode(value));
     els.meta.appendChild(row);
   }
+
+  renderActivity(issue.activity);
+}
+
+function renderActivity(a) {
+  els.activity.textContent = '';
+  if (!a) return;
+  const box = document.createElement('div');
+  box.className = a.kind === 'status' ? 'activity status' : 'activity';
+  const who = document.createElement('div');
+  who.className = 'who';
+  const what = a.kind === 'comment' ? '💬 Latest comment' : '🔄 Status update';
+  who.textContent = `${what} — ${a.author}, ${relativeTime(a.when)}`;
+  const body = document.createElement('div');
+  body.className = 'body';
+  const text = String(a.text || '');
+  body.textContent = text.length > 500 ? `${text.slice(0, 500)}…` : text;
+  box.append(who, body);
+  els.activity.appendChild(box);
 }
 
 function showMessage(html) {
@@ -150,13 +170,69 @@ function showMessage(html) {
 }
 
 async function fetchIssue(base) {
-  const fields = 'summary,status,issuetype,priority,assignee,reporter,updated';
+  const fields = 'summary,status,issuetype,priority,assignee,reporter,updated,comment';
   const resp = await fetch(
-    `${base}/rest/api/2/issue/${encodeURIComponent(ticketKey)}?fields=${fields}`,
+    `${base}/rest/api/2/issue/${encodeURIComponent(ticketKey)}?fields=${fields}&expand=changelog`,
     { credentials: 'include', headers: { Accept: 'application/json' } },
   );
   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
   return resp.json();
+}
+
+// Newest of: the latest comment, or the latest status transition from the
+// changelog — whichever happened more recently.
+function latestActivity(issue) {
+  let latest = null;
+
+  const comments = (issue.fields && issue.fields.comment && issue.fields.comment.comments) || [];
+  if (comments.length) {
+    const c = comments[comments.length - 1];
+    latest = {
+      kind: 'comment',
+      author: (c.author && c.author.displayName) || 'Unknown',
+      when: c.updated || c.created,
+      text: typeof c.body === 'string' ? c.body : '(comment)',
+    };
+  }
+
+  const histories = (issue.changelog && issue.changelog.histories) || [];
+  for (let i = histories.length - 1; i >= 0; i--) {
+    const h = histories[i];
+    const item = (h.items || []).find((it) => it.field === 'status');
+    if (!item) continue;
+    if (!latest || Date.parse(h.created) > Date.parse(latest.when)) {
+      latest = {
+        kind: 'status',
+        author: (h.author && h.author.displayName) || 'Unknown',
+        when: h.created,
+        text: `Status changed from "${item.fromString}" to "${item.toString}"`,
+      };
+    }
+    break; // histories are chronological, so the first hit from the end is the newest
+  }
+
+  return latest;
+}
+
+// Compact snapshot of everything the viewer renders — this is what gets
+// cached and compared, so unrelated API noise doesn't count as a change.
+function toModel(issue) {
+  const f = issue.fields || {};
+  return {
+    fields: {
+      summary: f.summary,
+      status: f.status && {
+        name: f.status.name,
+        statusCategory: f.status.statusCategory && { colorName: f.status.statusCategory.colorName },
+      },
+      issuetype: f.issuetype && { name: f.issuetype.name },
+      priority: f.priority && { name: f.priority.name },
+      assignee: f.assignee && { displayName: f.assignee.displayName },
+      reporter: f.reporter && { displayName: f.reporter.displayName },
+      updated: f.updated,
+    },
+    activity: latestActivity(issue),
+  };
 }
 
 async function init() {
@@ -190,16 +266,16 @@ async function init() {
   }
 
   try {
-    const issue = await fetchIssue(base);
+    const model = toModel(await fetchIssue(base));
     const changed = !cached
-      || JSON.stringify(cached.issue.fields) !== JSON.stringify(issue.fields);
+      || JSON.stringify(cached.issue) !== JSON.stringify(model);
     if (changed) {
-      render(issue);
+      render(model);
       setFreshness(cached ? 'Updated just now' : 'Loaded just now', !!cached);
     } else {
       setFreshness('Up to date — checked just now');
     }
-    await writeCache(ticketKey, issue);
+    await writeCache(ticketKey, model);
   } catch (e) {
     if (cached) {
       setFreshness(`Couldn't refresh (${e.message}) — showing cached data from ${relativeTime(cached.fetchedAt)}`);

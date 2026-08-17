@@ -79,8 +79,10 @@ file and reload the extension. Default:
   viewer** (`viewer.html`) instead of the raw Jira page. The viewer fetches
   the ticket from `jiraBase`'s REST API using your existing Jira browser
   session and shows summary, colored issue-type / priority / status badges,
-  assignee, and last-update time — with an "Open in Jira ↗" link. Rules
-  without `jiraKey` open their URL directly. Tickets are cached (last 50, in
+  assignee, and last-update time — with an "Open in Jira ↗" link. It also
+  shows the newest activity on the ticket: the latest comment or the latest
+  status transition, whichever happened more recently, with author and
+  relative time. Rules without `jiraKey` open their URL directly. Tickets are cached (last 50, in
   `storage.local`): the viewer instantly renders the last known state, then
   refreshes from Jira in the background and only repaints if something
   changed — a status line at the bottom says whether you're looking at
