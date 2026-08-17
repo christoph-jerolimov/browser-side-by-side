@@ -80,7 +80,11 @@ file and reload the extension. Default:
   the ticket from `jiraBase`'s REST API using your existing Jira browser
   session and shows summary, colored issue-type / priority / status badges,
   assignee, and last-update time — with an "Open in Jira ↗" link. Rules
-  without `jiraKey` open their URL directly.
+  without `jiraKey` open their URL directly. Tickets are cached (last 50, in
+  `storage.local`): the viewer instantly renders the last known state, then
+  refreshes from Jira in the background and only repaints if something
+  changed — a status line at the bottom says whether you're looking at
+  cached, up-to-date, or just-updated data.
 
 The Jira rules cover both bare ticket IDs (`ABC-1234` →
 `https://redhat.atlassian.net/browse/ABC-1234`) and full

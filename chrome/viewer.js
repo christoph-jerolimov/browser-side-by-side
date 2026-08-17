@@ -18,8 +18,35 @@ const els = {
   badges: document.getElementById('badges'),
   meta: document.getElementById('meta'),
   message: document.getElementById('message'),
+  freshness: document.getElementById('freshness'),
   openLink: document.getElementById('open-link'),
 };
+
+// ------------------------------------------------------------------- cache
+
+const CACHE_KEY = 'ticketCache';
+const CACHE_MAX_ENTRIES = 50;
+
+async function readCache() {
+  const obj = await api.storage.local.get({ [CACHE_KEY]: {} });
+  return obj[CACHE_KEY] || {};
+}
+
+async function writeCache(key, issue) {
+  const cache = await readCache();
+  cache[key] = { issue, fetchedAt: new Date().toISOString() };
+  const keys = Object.keys(cache);
+  if (keys.length > CACHE_MAX_ENTRIES) {
+    keys.sort((a, b) => Date.parse(cache[a].fetchedAt) - Date.parse(cache[b].fetchedAt));
+    for (const stale of keys.slice(0, keys.length - CACHE_MAX_ENTRIES)) delete cache[stale];
+  }
+  await api.storage.local.set({ [CACHE_KEY]: cache });
+}
+
+function setFreshness(text, changed) {
+  els.freshness.textContent = text;
+  els.freshness.className = changed ? 'changed' : '';
+}
 
 // Jira-like colors, keyed by lowercased name (fallbacks per badge kind).
 const TYPE_COLORS = {
@@ -154,10 +181,30 @@ async function init() {
     return;
   }
 
+  // Render the last known state immediately, then refresh from Jira and only
+  // repaint if something actually changed.
+  const cached = (await readCache())[ticketKey];
+  if (cached) {
+    render(cached.issue);
+    setFreshness(`Showing cached data from ${relativeTime(cached.fetchedAt)} — refreshing…`);
+  }
+
   try {
     const issue = await fetchIssue(base);
-    render(issue);
+    const changed = !cached
+      || JSON.stringify(cached.issue.fields) !== JSON.stringify(issue.fields);
+    if (changed) {
+      render(issue);
+      setFreshness(cached ? 'Updated just now' : 'Loaded just now', !!cached);
+    } else {
+      setFreshness('Up to date — checked just now');
+    }
+    await writeCache(ticketKey, issue);
   } catch (e) {
+    if (cached) {
+      setFreshness(`Couldn't refresh (${e.message}) — showing cached data from ${relativeTime(cached.fetchedAt)}`);
+      return;
+    }
     els.summary.classList.remove('spinner');
     els.summary.textContent = ticketKey;
     const a = document.createElement('a');
