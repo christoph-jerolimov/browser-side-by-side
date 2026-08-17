@@ -36,6 +36,13 @@
       background: #fff7e6; color: #7a5c00; border: 1px solid #ffe1a6;
     }
     .note a { font-weight: 600; }
+    .activity {
+      margin-top: 24px; padding: 14px 16px; border-radius: 8px;
+      background: #f4f5f7; border-left: 4px solid #0052cc;
+    }
+    .activity.status { border-left-color: #00875a; }
+    .activity .who { margin-bottom: 6px; font-size: 13px; font-weight: 600; color: #6b778c; }
+    .activity .body { white-space: pre-wrap; overflow-wrap: anywhere; }
     .spinner { color: #6b778c; }
     #freshness { margin-top: 20px; font-size: 13px; color: #6b778c; }
     #freshness.changed { color: #00875a; font-weight: 600; }
@@ -47,6 +54,7 @@
   <h1 id="summary" class="spinner">Loading…</h1>
   <div class="badges" id="badges"></div>
   <div id="meta"></div>
+  <div id="activity"></div>
   <div id="message"></div>
   <div id="freshness"></div>
   <footer><a id="open-link" target="_blank">Open in Jira ↗</a></footer>
