@@ -10,11 +10,6 @@
       "name": "GitHub PR",
       "match": "https?://github\\.com/[^/\\s]+/[^/\\s]+/pulls?/\\d+",
       "url": "$0"
-    },
-    {
-      "name": "Any link",
-      "match": "https?://[^\\s)\\]]+",
-      "url": "$0"
     }
   ]
 }
