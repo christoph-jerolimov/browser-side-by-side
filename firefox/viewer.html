@@ -37,7 +37,9 @@
     }
     .note a { font-weight: 600; }
     .spinner { color: #6b778c; }
-    footer { margin-top: 30px; font-size: 14px; }
+    #freshness { margin-top: 20px; font-size: 13px; color: #6b778c; }
+    #freshness.changed { color: #00875a; font-weight: 600; }
+    footer { margin-top: 14px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -46,6 +48,7 @@
   <div class="badges" id="badges"></div>
   <div id="meta"></div>
   <div id="message"></div>
+  <div id="freshness"></div>
   <footer><a id="open-link" target="_blank">Open in Jira ↗</a></footer>
   <script src="viewer.js"></script>
 </body>
