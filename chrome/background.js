@@ -176,6 +176,20 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return true; // keep the channel open for the async response
 });
 
+// Make the sidebar content a bit bigger than default (config: sidebarZoom).
+async function applySidebarZoom(tabId) {
+  const cfg = await getConfig().catch(() => ({}));
+  const zoom = Number(cfg.sidebarZoom) || 1;
+  if (zoom === 1) return;
+  try { await api.tabs.setZoom(tabId, zoom); } catch (e) { /* page disallows zoom */ }
+}
+
+api.tabs.onUpdated.addListener(async (tabId, changeInfo) => {
+  if (changeInfo.status !== 'complete') return;
+  const state = await getState();
+  if (tabId === state.companionTabId) applySidebarZoom(tabId);
+});
+
 api.windows.onRemoved.addListener(async (windowId) => {
   const state = await getState();
   if (windowId === state.companionWindowId) await clearCompanion();
