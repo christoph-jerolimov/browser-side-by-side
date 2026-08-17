@@ -2,9 +2,14 @@
   "autoTile": true,
   "rules": [
     {
+      "name": "Jira link",
+      "match": "https?://redhat\\.atlassian\\.net/[^\\s)\\]]+",
+      "url": "$0"
+    },
+    {
       "name": "Jira",
       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",
-      "url": "https://jira.com/browse/$0"
+      "url": "https://redhat.atlassian.net/browse/$0"
     },
     {
       "name": "GitHub PR",
