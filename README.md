@@ -4,7 +4,7 @@ A personal Chrome + Firefox extension that watches your **selection and cursor
 position in a Google Docs document** and mirrors matching content into a
 second, side-by-side browser window ("sidebar"):
 
-- Select `ABC-1234` → the sidebar opens/navigates to `https://jira.com/browse/ABC-1234`.
+- Select `ABC-1234` → the sidebar opens/navigates to `https://redhat.atlassian.net/browse/ABC-1234`.
 - Put the cursor on a link like `https://github.com/org/repo/pull/123` → the
   sidebar opens that link.
 - A **Follow / Pause** toggle (toolbar popup) controls whether the sidebar
@@ -53,7 +53,8 @@ file and reload the extension. Default:
 {
   "autoTile": true,
   "rules": [
-    { "name": "Jira",       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",                        "url": "https://jira.com/browse/$0" },
+    { "name": "Jira link",  "match": "https?://redhat\\.atlassian\\.net/[^\\s)\\]]+",        "url": "$0" },
+    { "name": "Jira",       "match": "\\b[A-Z][A-Z0-9]{1,9}-\\d+\\b",                        "url": "https://redhat.atlassian.net/browse/$0" },
     { "name": "GitHub PR",  "match": "https?://github\\.com/[^/\\s]+/[^/\\s]+/pulls?/\\d+",  "url": "$0" }
   ]
 }
@@ -68,8 +69,10 @@ file and reload the extension. Default:
 - `autoTile`: set to `false` if the extension should never move/resize your
   windows and you always want to arrange them yourself.
 
-Change the Jira base URL to your real instance (e.g.
-`https://mycorp.atlassian.net/browse/$0`).
+The Jira rules cover both bare ticket IDs (`ABC-1234` →
+`https://redhat.atlassian.net/browse/ABC-1234`) and full
+`redhat.atlassian.net` links, which open as-is. Adjust the base URL if you
+use a different Jira instance.
 
 ## Install — Chrome (unpacked, for development/personal use)
 
